@@ -3,6 +3,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 import pandas as pd
+def scroll_down(driver):
+    """Scrollowanie strony poprzez kombinacje klawiszy control + end"""
+    driver.find_element(By.CSS_SELECTOR, "body").send_keys(Keys.CONTROL, Keys.END)
+    time.sleep(5)
 def get_smartphones_neonet(min_price):
     driver = webdriver.Chrome()
     driver.maximize_window()
@@ -23,26 +27,40 @@ def get_smartphones_neonet(min_price):
     smartphones = []
     while True:
         try:
-            products = driver.find_elements(By.XPATH, '//h2[contains(@class, "3gj")]')
-            for product in products:
+            scroll_down(driver)
+            names = []
+            prices = []
+            name_elements = driver.find_elements(By.XPATH, '//h2[contains(@class, "listingItemHeaderScss-name_limit-3gj listingItemHeaderScss-name")]')
+            for name_element in name_elements:
                 try:
-                    name = product.find_element(By.XPATH, '//h2[contains(@class, "3gj")]').text
-                    price_text = product.find_element(By.XPATH, '//span[contains(@class, "uiPriceSimpleScss")]').text
-                    price = str(price_text.replace(' ', '').replace(',', '.'))
-                    smartphones.append({'name': name, 'price': price, 'source': 'Neonet'})
+                    name = name_element.get_attribute("textContent")
+                    names.append(name)
                 except Exception as e:
-                    print(f'Error extracting data: {e}')
+                    print(f'Error extracting name: {e}')
+
+            price_elements = driver.find_elements(By.XPATH, '//span[contains(@class, "uiPriceSimpleScss-priceWrapper-2zA priceAreaScss-price")]')
+            for price_element in price_elements:
+                try:
+                    price_text = price_element.get_attribute("textContent")
+                    price =str(price_text.replace(' ', '').replace(',', '.').replace('zł', ''))
+                    prices.append(price)
+                except Exception as e:
+                    print(f'Error extracting price: {e}')
+
+            for name, price in zip(names, prices):
+                smartphones.append({'name': name, 'price': price, 'source': 'Neonet'})
 
             next_button = driver.find_element(By.XPATH, '//*[@id="mainColumn"]/section[2]/button')
             if next_button:
-                next_button.click()
-                time.sleep(5)  # Czekaj, aby następna strona się załadowała
+                webdriver.ActionChains(driver).move_to_element(next_button).click().perform()
+                time.sleep(10)
             else:
                 break
         except Exception as e:
             print(f'Error: {e}')
             break
 
+    driver.quit()
     return smartphones
 def get_smartphones_xkom(min_price):
     driver = webdriver.Chrome()
@@ -64,17 +82,30 @@ def get_smartphones_xkom(min_price):
 
     smartphones = []
     page_number = 1
+
     while True:
         try:
-            products = driver.find_elements(By.XPATH, '//h3[contains(@class, "dqjhiw")]')
-            for product in products:
+            names = []
+            prices = []
+            name_elements = driver.find_elements(By.XPATH, '//h3[contains(@class, "dqjhiw")]')
+            for name_element in name_elements:
                 try:
-                    name = product.find_element(By.XPATH, '//h3[contains(@class, "dqjhiw")]').text
-                    price_text = product.find_element(By.XPATH, '//span[contains(@class, "dTaXAZ")]').text
-                    price = str(price_text.replace(' ', '').replace(',', '.'))
-                    smartphones.append({'name': name, 'price': price, 'source': 'X-Kom'})
+                    name = name_element.get_attribute("textContent")
+                    names.append(name)
                 except Exception as e:
-                    print(f'Error extracting data: {e}')
+                    print(f'Error extracting name: {e}')
+
+            price_elements = driver.find_elements(By.XPATH, '//span[contains(@class, "dTaXAZ")]')
+            for price_element in price_elements:
+                try:
+                    price_text = price_element.get_attribute("textContent")
+                    price =str(price_text.replace(' ', '').replace(',', '.').replace('zł', ''))
+                    prices.append(price)
+                except Exception as e:
+                    print(f'Error extracting price: {e}')
+
+            for name, price in zip(names, prices):
+                smartphones.append({'name': name, 'price': price, 'source': 'Neonet'})
 
             if page_number == 1:
                 # XPath dla pierwszej strony
@@ -96,6 +127,7 @@ def get_smartphones_xkom(min_price):
             print(f'Error: {e}')
             break
 
+    driver.quit()
     return smartphones
 
 min_price = 3000
