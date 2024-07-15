@@ -3,10 +3,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 import pandas as pd
+
 def scroll_down(driver):
     """Scrollowanie strony poprzez kombinacje klawiszy control + end"""
     driver.find_element(By.CSS_SELECTOR, "body").send_keys(Keys.CONTROL, Keys.END)
     time.sleep(5)
+
 def get_smartphones_neonet(min_price):
     driver = webdriver.Chrome()
     driver.maximize_window()
@@ -31,6 +33,7 @@ def get_smartphones_neonet(min_price):
             names = []
             prices = []
             name_elements = driver.find_elements(By.XPATH, '//h2[contains(@class, "listingItemHeaderScss-name_limit-3gj listingItemHeaderScss-name")]')
+
             for name_element in name_elements:
                 try:
                     name = name_element.get_attribute("textContent")
@@ -56,12 +59,14 @@ def get_smartphones_neonet(min_price):
                 time.sleep(10)
             else:
                 break
+
         except Exception as e:
             print(f'Error: {e}')
             break
 
     driver.quit()
     return smartphones
+
 def get_smartphones_xkom(min_price):
     driver = webdriver.Chrome()
     driver.maximize_window()
@@ -88,6 +93,7 @@ def get_smartphones_xkom(min_price):
             names = []
             prices = []
             name_elements = driver.find_elements(By.XPATH, '//h3[contains(@class, "dqjhiw")]')
+
             for name_element in name_elements:
                 try:
                     name = name_element.get_attribute("textContent")
@@ -119,6 +125,7 @@ def get_smartphones_xkom(min_price):
                 next_button.click()
                 page_number += 1
                 time.sleep(5)
+                
             except Exception as e:
                 print(f'Brak kolejnej strony: {e}')
                 break
