@@ -9,6 +9,7 @@ def scroll_down(driver):
     driver.find_element(By.CSS_SELECTOR, "body").send_keys(Keys.CONTROL, Keys.END)
     time.sleep(5)
 
+"""Obsługa drivera neonet"""
 def get_smartphones_neonet(min_price):
     driver = webdriver.Chrome()
     driver.maximize_window()
@@ -67,6 +68,7 @@ def get_smartphones_neonet(min_price):
     driver.quit()
     return smartphones
 
+"""Obsługa drivera xkom"""
 def get_smartphones_xkom(min_price):
     driver = webdriver.Chrome()
     driver.maximize_window()
@@ -125,7 +127,7 @@ def get_smartphones_xkom(min_price):
                 next_button.click()
                 page_number += 1
                 time.sleep(5)
-                
+
             except Exception as e:
                 print(f'Brak kolejnej strony: {e}')
                 break
